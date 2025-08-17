@@ -1,0 +1,55 @@
+import axios from 'axios';
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+
+import { getImagesByQuery } from "./js/pixaby-api.js"
+import { createGallery, clearGallery, showLoader, hideLoader } from "./js/render-functions.js"
+    
+const searchForm = document.querySelector('.form');
+const inputField = document.querySelector('input[name="search-text"]');
+const searchButton = document.querySelector('button');
+
+searchButton.disabled = true;
+
+inputField.addEventListener("input", (event) => { 
+    if (inputField.value.trim() === '')
+        searchButton.disabled = true;
+    else searchButton.disabled = false;
+})
+
+searchForm.addEventListener("submit", (event) => { 
+    showLoader();
+    event.preventDefault();
+    clearGallery();
+    const query = inputField.value.trim();
+    getImagesByQuery(query)
+        .then((response) => { 
+            const galleryArray = response.data.hits;
+            if (galleryArray.length === 0) {
+                hideLoader();
+                iziToast.warning({
+                    title: ':(',
+                    message: 'So sad, nothing found',
+                    position: 'topRight',
+                });
+                searchForm.reset();
+                searchButton.disabled = true;
+
+            }
+            else {
+                createGallery(galleryArray);
+                hideLoader();
+             }
+        })
+        .catch((error) => {iziToast.warning({
+                    title: 'OH MY GOD, SOMETHING WENT WRONG!',
+                    message: `${error}`,
+                    position: 'topRight',
+            });
+            hideLoader();
+        });
+
+});
+
+
+
