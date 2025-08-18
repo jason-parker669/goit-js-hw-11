@@ -19,13 +19,12 @@ inputField.addEventListener("input", (event) => {
 })
 
 searchForm.addEventListener("submit", (event) => { 
-    showLoader();
     event.preventDefault();
+    showLoader();
     clearGallery();
     const query = inputField.value.trim();
     getImagesByQuery(query)
-        .then((response) => { 
-            const galleryArray = response.data.hits;
+        .then((galleryArray) => { 
             if (galleryArray.length === 0) {
                 hideLoader();
                 iziToast.warning({
